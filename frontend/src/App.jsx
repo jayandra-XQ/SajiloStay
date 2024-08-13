@@ -1,10 +1,30 @@
-import Header from "./components/Header"
+import { Routes, Route } from 'react-router-dom'
+import { UserContextProvider } from "./UserContext"
+import { Toaster } from 'react-hot-toast'
+
+import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
+import Layout from './Layout'
+import RegisterPage from './pages/RegisterPage'
+
 
 const App = () => {
   return (
-   <div>
-    <Header />
-   </div>
+    <div>
+      <UserContextProvider>
+
+      <Routes>
+        <Route path='/' element={<Layout />}>
+          <Route index element={<HomePage />} />
+          <Route path='/login' element={<LoginPage />} />
+          <Route path='/register' element={<RegisterPage />} />
+
+        </Route>
+      </Routes>
+      </UserContextProvider>
+      <Toaster />
+
+    </div>
   )
 }
 
