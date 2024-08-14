@@ -8,14 +8,17 @@ export function UserContextProvider({children}) {
 
   const [user, setUser] = useState(null);
 
+  const [ready , setReady] = useState(false);
+
   useEffect(() => {
       axios.get('/api/user/profile').then((res)=> {
         setUser(res.data);
+        setReady(true);
       })
-  },[user]);
+  },[]);
   
   return (
-    <UserContext.Provider value={{user,setUser}}>
+    <UserContext.Provider value={{user,setUser, ready}}>
       {children}
     </UserContext.Provider>
   )
