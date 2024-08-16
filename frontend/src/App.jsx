@@ -22,6 +22,8 @@ const App = () => {
 
             <Route path='/account' element={<AccountPage />}>
               <Route path=':subpage' element={<AccountPage />} />
+              <Route path=':subpage/:action' element={<AccountPage />} />
+
             </Route>
             
           </Route>
