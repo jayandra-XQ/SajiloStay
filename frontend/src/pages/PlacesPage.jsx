@@ -1,15 +1,17 @@
 import { Link, useParams } from "react-router-dom"
-import { useState } from "react";
+import {  useEffect, useState } from "react";
 import Perks from "../Perks";
 import PhotoUpload from "../PhotoUpload";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import PlacesList from "../components/placeList";
 
 
 const PlacesPage = () => {
   const { action } = useParams();
 
+ 
   const [title, setTitle] = useState('');
   const [address, setAdress] = useState('');
   const [addedPhotos, setAddedPhotos] = useState([]);
@@ -20,14 +22,16 @@ const PlacesPage = () => {
   const [checkOut, setCheckOut] = useState('');
   const [maxGuests, setMaxGuests] = useState(1);
 
+  const [places, setPlaces] = useState([]);
+
   const navigate = useNavigate();
 
   const addNewPlace = async (e) => {
     e.preventDefault();
-    
+
     try {
-       // Ensure `addedPhotos` is a flat array of strings
-    const formattedPhotos = addedPhotos.flat(); // Flattening if it's nested
+      // Ensure `addedPhotos` is a flat array of strings
+      const formattedPhotos = addedPhotos.flat(); // Flattening if it's nested
 
       await axios.post('/api/user/places', {
         title,
@@ -40,7 +44,7 @@ const PlacesPage = () => {
         maxGuests,
         photos: formattedPhotos
       });
-      
+
       toast.success("Place added successfully!"); // Use toast for a better user experience
       navigate('/account/places'); // Navigate to the places page after successful addition
     } catch (error) {
@@ -48,23 +52,48 @@ const PlacesPage = () => {
       toast.error("Failed to add new place."); // Use toast for error notification
     }
   }
-  
+
+  useEffect(() => {
+    axios.get('/api/user/get-place')
+      .then((res) => {
+       setPlaces(res.data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch place:", err.message);
+        toast.error("Failed to fetch place."); // Use toast for error notification
+      });
+  }, []);
+ 
+
+  if (!places) {
+    return <div>Loading...</div>;
+  }
+
+
 
 
   return (
     <>
       <div>
         {action !== 'new' && (
-          <div className=" text-center">
-            <Link className="inline-flex gap-1 bg-primary text-white py-2 px-6 rounded-full" to={'/account/places/new'}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
+          <>
+            <div className=" text-center">
+              <Link className="inline-flex gap-1 bg-primary text-white py-2 px-6 rounded-full" to={'/account/places/new'}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
 
-              Add new place
-            </Link>
-          </div>
+                Add new place
+              </Link>
+            </div>
+
+            <div className="mt-5">
+              <PlacesList places={places}/>
+            </div>
+          </>
+
+
         )}
 
         {action === 'new' && (
@@ -92,7 +121,7 @@ const PlacesPage = () => {
             {/* photos */}
             <h2 className="text-xl mt-4 ">Photos</h2>
             <p className="text-gray-500 text-sm">The more photos you add, the better! Show off your place from every angle.</p>
-            <PhotoUpload addedPhotos={addedPhotos} onChange={setAddedPhotos}/>
+            <PhotoUpload addedPhotos={addedPhotos} onChange={setAddedPhotos} />
 
 
             {/* description */}

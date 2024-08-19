@@ -32,3 +32,13 @@ export const placeAdd = async (req,res) => {
   }
   
 }
+
+export const placeList = async (req,res) => {
+  try {
+    const places = await Place.find({owner: req.user._id}).populate('owner');
+    res.json(places);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({message: "Internal Server Error"});
+  }
+}
