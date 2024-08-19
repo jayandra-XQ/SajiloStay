@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom"
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Perks from "../Perks";
 import PhotoUpload from "../PhotoUpload";
 import axios from "axios";
@@ -11,7 +11,11 @@ import PlacesList from "../components/placeList";
 const PlacesPage = () => {
   const { action } = useParams();
 
- 
+  const { id } = useParams();
+
+
+
+
   const [title, setTitle] = useState('');
   const [address, setAdress] = useState('');
   const [addedPhotos, setAddedPhotos] = useState([]);
@@ -56,14 +60,37 @@ const PlacesPage = () => {
   useEffect(() => {
     axios.get('/api/user/get-place')
       .then((res) => {
-       setPlaces(res.data);
+        setPlaces(res.data);
       })
       .catch((err) => {
         console.error("Failed to fetch place:", err.message);
         toast.error("Failed to fetch place."); // Use toast for error notification
       });
   }, []);
- 
+
+
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+
+    axios.get(`/api/user/place/${id}`)
+    .then((res)=> {
+      setTitle(res.data.title);
+      setAdress(res.data.address);
+      setDescription(res.data.description);
+      setPerks(res.data.perks);
+      setExtraInfo(res.data.extraInfo);
+      setCheckIn(res.data.checkIn.toString());
+      setCheckOut(res.data.checkOut.toString());
+      setMaxGuests(res.data.maxGuests);
+      setAddedPhotos(res.data.photos);
+    })
+    .catch((err)=> {
+      console.error("Failed to fetch place:", err.message);
+      toast.error("Failed to fetch place."); // Use toast for error notification
+    })
+    })
 
   if (!places) {
     return <div>Loading...</div>;
@@ -89,7 +116,7 @@ const PlacesPage = () => {
             </div>
 
             <div className="mt-5">
-              <PlacesList places={places}/>
+              <PlacesList places={places} />
             </div>
           </>
 

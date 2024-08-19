@@ -42,3 +42,13 @@ export const placeList = async (req,res) => {
     res.status(500).json({message: "Internal Server Error"});
   }
 }
+
+export const listingPlaceOnHome = async (req,res) => {
+  try {
+    const places = await Place.find().populate('owner');
+    res.json(places);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({message: "Internal Server Error"});
+  }
+}

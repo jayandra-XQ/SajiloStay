@@ -1,4 +1,4 @@
-import { useContext } from "react"
+import { useContext} from "react"
 import { UserContext } from '../UserContext'
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useParams } from "react-router-dom";
@@ -17,6 +17,7 @@ const AccountPage = () => {
 
   const location = useLocation();
 
+  
   if (!ready) {
     return <div>Loading...</div>
   }

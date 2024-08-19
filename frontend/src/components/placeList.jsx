@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 const PlacesList = ({ places }) => {
+  
   return (
     <div className="space-y-4">
       {places.length > 0 ? (

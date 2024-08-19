@@ -9,6 +9,7 @@ import RegisterPage from './pages/RegisterPage'
 import AccountPage from './pages/AccountPage'
 
 
+
 const App = () => {
   return (
     <div>
@@ -23,9 +24,8 @@ const App = () => {
             <Route path='/account' element={<AccountPage />}>
               <Route path=':subpage' element={<AccountPage />} />
               <Route path=':subpage/:action' element={<AccountPage />} />
-
+              
             </Route>
-            
           </Route>
         </Routes>
       </UserContextProvider>
