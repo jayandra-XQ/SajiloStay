@@ -33,6 +33,7 @@ app.use('/api/auth' , authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/upload', uploadRoutes);
 
+
 app.listen(PORT, ()=> {
   console.log(`server running at port ${PORT}`);
   connectMongoDB();

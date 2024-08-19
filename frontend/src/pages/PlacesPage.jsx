@@ -1,8 +1,11 @@
 import { Link, useParams } from "react-router-dom"
 import { useState } from "react";
 import Perks from "../Perks";
-import axios from 'axios';
-import { toast } from 'react-hot-toast'
+import PhotoUpload from "../PhotoUpload";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
 
 const PlacesPage = () => {
   const { action } = useParams();
@@ -10,7 +13,6 @@ const PlacesPage = () => {
   const [title, setTitle] = useState('');
   const [address, setAdress] = useState('');
   const [addedPhotos, setAddedPhotos] = useState([]);
-  const [photoLink, setPhotoLink] = useState('');
   const [description, setDescription] = useState('');
   const [perks, setPerks] = useState([]);
   const [extraInfo, setExtraInfo] = useState('');
@@ -18,24 +20,35 @@ const PlacesPage = () => {
   const [checkOut, setCheckOut] = useState('');
   const [maxGuests, setMaxGuests] = useState(1);
 
+  const navigate = useNavigate();
 
-  const addPhotoByLink = async (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
-
+  const addNewPlace = async (e) => {
+    e.preventDefault();
+    
     try {
-      const response = await axios.post('/api/upload/upload-by-link', { link: photoLink });
-      const { filePath } = response.data; // Extract the file path from the response
+       // Ensure `addedPhotos` is a flat array of strings
+    const formattedPhotos = addedPhotos.flat(); // Flattening if it's nested
 
-      toast.success("Photo uploaded successfully!"); // Show a success message
-      setAddedPhotos(prev => [...prev, filePath]); // Update the state with the new photo link
-      setPhotoLink(''); // Clear the input field for the photo link
+      await axios.post('/api/user/places', {
+        title,
+        address,
+        description,
+        perks,
+        extraInfo,
+        checkIn: parseInt(checkIn, 10), // Converts "14:00" to 14
+        checkOut: parseInt(checkOut, 10), // Converts "16:00" to 16
+        maxGuests,
+        photos: formattedPhotos
+      });
+      
+      toast.success("Place added successfully!"); // Use toast for a better user experience
+      navigate('/account/places'); // Navigate to the places page after successful addition
     } catch (error) {
-      toast.error("Failed to upload photo", error); // Show an error message
+      console.error("Failed to add new place:", error.message);
+      toast.error("Failed to add new place."); // Use toast for error notification
     }
   }
-
-
-
+  
 
 
   return (
@@ -55,7 +68,7 @@ const PlacesPage = () => {
         )}
 
         {action === 'new' && (
-          <form >
+          <form onSubmit={addNewPlace}>
             {/* title */}
             <h2 className="text-xl mt-4 ">Title</h2>
             <p className="text-gray-500 text-sm">Give your place a catchy title that stands out, just like in an advertisement.</p>
@@ -79,38 +92,7 @@ const PlacesPage = () => {
             {/* photos */}
             <h2 className="text-xl mt-4 ">Photos</h2>
             <p className="text-gray-500 text-sm">The more photos you add, the better! Show off your place from every angle.</p>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={photoLink}
-                onChange={e => setPhotoLink(e.target.value)}
-                placeholder="Add photo using a link"
-              />
-              <button onClick={addPhotoByLink} className="bg-gray-200 px-4 rounded-2xl">Add Photo</button>
-            </div>
-            <div className=" mt-2 grid gap-2 grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-              {addedPhotos.length > 0 ? (
-                <div className="mt-2 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                  {addedPhotos.map((link, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={`http://localhost:5001/uploads/${link}`}
-                        alt={`Uploaded photo ${index}`}
-                        className="w-full h-auto object-cover rounded"
-                      />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p>No photos uploaded yet.</p>
-              )}
-              <button className="flex items-center gap-1 justify-center border bg-transparent rounded-2xl p-3 text-gray-500">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
-                </svg>
-                Upload
-              </button>
-            </div>
+            <PhotoUpload addedPhotos={addedPhotos} onChange={setAddedPhotos}/>
 
 
             {/* description */}
